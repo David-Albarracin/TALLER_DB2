@@ -1135,24 +1135,100 @@ Resuelva todas las consultas utilizando la sintaxis de SQL1 y SQL2.
    (columna gastos).
 
    ````sql
+   SELECT DISTINCT 
+   	 d.nombre,
+   	(d.presupuesto - d.gastos) AS 'Presupuesto Actual'
+   FROM 
+   	departamento AS d 
+   JOIN
+   	empleado AS e ON e.codigo_departamento = d.codigo ; 
+   	
+   +------------------+--------------------+
+   | nombre           | Presupuesto Actual |
+   +------------------+--------------------+
+   | Desarrollo       |             114000 |
+   | Sistemas         |             129000 |
+   | Recursos Humanos |             255000 |
+   | Contabilidad     |             107000 |
+   | I+D              |              -5000 |
+   +------------------+--------------------+
+   5 rows in set (0,00 sec)
+   
    ````
 
 5. Devuelve el nombre del departamento donde trabaja el empleado que tiene
    el nif 38382980M.
 
    `````sql
+   SELECT 
+   	 d.nombre
+   FROM 
+   	empleado AS e 
+   JOIN
+   	departamento AS d ON e.codigo_departamento = d.codigo
+   WHERE 
+   	e.nit = '38382980M';
+   
+   
+   +------------+
+   | nombre     |
+   +------------+
+   | Desarrollo |
+   +------------+
+   1 row in set (0,00 sec)
+   
    `````
 
 6. Devuelve el nombre del departamento donde trabaja el empleado Pepe Ruiz
    Santana.
 
    ````sql
+   SELECT 
+   	 d.nombre
+   FROM 
+   	empleado AS e 
+   JOIN
+   	departamento AS d ON e.codigo_departamento = d.codigo
+   WHERE 
+   	CONCAT(
+   		e.nombre, ' ',
+   		e.apellido1, ' ',
+   		e.apellido2 
+   	) LIKE 'Pepe Ruiz Santana';
+   
+   +------------------+
+   | nombre           |
+   +------------------+
+   | Recursos Humanos |
+   +------------------+
+   1 row in set (0,00 sec)
+   
    ````
 
 7. Devuelve un listado con los datos de los empleados que trabajan en el
    departamento de I+D. Ordena el resultado alfabéticamente.
 
    ````sql
+   SELECT 
+   	 e.nit,
+   	 e.nombre 
+   FROM 
+   	empleado AS e
+   JOIN
+   	departamento AS d ON e.codigo_departamento = d.codigo
+   WHERE 
+   	d.nombre = 'I+D'
+   ORDER BY
+   	e.nombre ASC;
+   	
+   +-----------+--------+
+   | nit       | nombre |
+   +-----------+--------+
+   | 46384486H | Diego  |
+   | 17087203C | Marcos |
+   +-----------+--------+
+   2 rows in set (0,00 sec)
+   
    ````
 
 8. Devuelve un listado con los datos de los empleados que trabajan en el
@@ -1160,12 +1236,58 @@ Resuelva todas las consultas utilizando la sintaxis de SQL1 y SQL2.
    alfabéticamente.
 
    ````sql
+   SELECT 
+   	 e.nit,
+   	 e.nombre 
+   FROM 
+   	empleado AS e
+   JOIN
+   	departamento AS d ON e.codigo_departamento = d.codigo
+   WHERE 
+   	d.nombre IN ('Sistemas', 'Contabilidad', 'I+D')
+   ORDER BY
+   	e.nombre ASC;
+   	
+   +-----------+---------+
+   | nit       | nombre  |
+   +-----------+---------+
+   | Y5575632D | Adela   |
+   | 77705545E | Adrián  |
+   | 46384486H | Diego   |
+   | 56399183D | Juan    |
+   | 17087203C | Marcos  |
+   | 80576669X | Pilar   |
+   +-----------+---------+
+   6 rows in set (0,00 sec)
+   
    ````
 
 9. Devuelve una lista con el nombre de los empleados que tienen los
    departamentos que no tienen un presupuesto entre 100000 y 200000 euros.
 
    ````sql
+   SELECT 
+   	 e.nombre 
+   FROM 
+   	empleado AS e
+   JOIN
+   	departamento AS d ON e.codigo_departamento = d.codigo
+   WHERE 
+   	d.presupuesto BETWEEN 100000 AND 200000;
+   
+   +---------+
+   | nombre  |
+   +---------+
+   | Aarón   |
+   | María   |
+   | Marta   |
+   | Adela   |
+   | Pilar   |
+   | Juan    |
+   | Adrián  |
+   +---------+
+   7 rows in set (0,00 sec)
+   
    ````
 
 10. Devuelve un listado con el nombre de los departamentos donde existe
@@ -1173,6 +1295,23 @@ Resuelva todas las consultas utilizando la sintaxis de SQL1 y SQL2.
     debe mostrar nombres de departamentos que estén repetidos.
 
     ````sql
+    SELECT DISTINCT 
+    	 d.nombre 
+    FROM 
+    	departamento AS d
+    JOIN
+    	empleado AS e ON e.codigo_departamento = d.codigo
+    WHERE 
+    	e.apellido2 IS NULL;
+    	
+    +--------------+
+    | nombre       |
+    +--------------+
+    | Contabilidad |
+    | Sistemas     |
+    +--------------+
+    2 rows in set (0,00 sec)
+    
     ````
 
 
@@ -1186,18 +1325,83 @@ Resuelva todas las consultas utilizando las cláusulas LEFT JOIN y RIGHT JOIN.
    empleados que no tienen ningún departamento asociado.
 
    ````sql
+   SELECT
+   	e.nombre, 
+   	d.nombre 
+   FROM 
+   	empleado AS e
+   LEFT JOIN
+   	departamento AS d ON d.codigo = e.codigo_departamento; 
+   	
+   +--------------+------------------+
+   | nombre       | nombre           |
+   +--------------+------------------+
+   | Aarón        | Desarrollo       |
+   | Adela        | Sistemas         |
+   | Adolfo       | Recursos Humanos |
+   | Adrián       | Contabilidad     |
+   | Marcos       | I+D              |
+   | María        | Desarrollo       |
+   | Pilar        | Sistemas         |
+   | Pepe         | Recursos Humanos |
+   | Juan         | Sistemas         |
+   | Diego        | I+D              |
+   | Marta        | Desarrollo       |
+   | Irene        | NULL             |
+   | Juan Antonio | NULL             |
+   +--------------+------------------+
+   13 rows in set (0,00 sec)
+   
+   
    ````
 
 2. Devuelve un listado donde sólo aparezcan aquellos empleados que no
    tienen ningún departamento asociado.
 
    ````sql
+   SELECT
+   	e.nit,
+   	e.nombre,
+   	d.nombre
+   FROM 
+   	empleado AS e
+   LEFT JOIN
+   	departamento AS d ON e.codigo_departamento = d.codigo 
+   WHERE
+   	e.codigo_departamento IS NULL
+   	
+   +-----------+--------------+--------+
+   | nit       | nombre       | nombre |
+   +-----------+--------------+--------+
+   | 41234836R | Irene        | NULL   |
+   | 82635162B | Juan Antonio | NULL   |
+   +-----------+--------------+--------+
+   2 rows in set (0,00 sec)
+   
    ````
 
 3. Devuelve un listado donde sólo aparezcan aquellos departamentos que no
    tienen ningún empleado asociado.
 
    ````sql
+   SELECT
+   	e.nombre AS 'Nombre Empleado',
+   	d.nombre AS 'Nombre Departamento'
+   FROM 
+   	empleado AS e
+   RIGHT JOIN
+   	departamento AS d ON e.codigo_departamento = d.codigo 
+   WHERE
+   	e.codigo_departamento IS NULL;
+   	
+   +-----------------+---------------------+
+   | Nombre Empleado | Nombre Departamento |
+   +-----------------+---------------------+
+   | NULL            | Proyectos           |
+   | NULL            | Publicidad          |
+   +-----------------+---------------------+
+   2 rows in set (0,00 sec)
+   
    ````
 
 4. Devuelve un listado con todos los empleados junto con los datos de los
@@ -1207,6 +1411,44 @@ Resuelva todas las consultas utilizando las cláusulas LEFT JOIN y RIGHT JOIN.
    nombre del departamento.
 
    ````sql
+   /*MySQL*/
+   SELECT 
+   	e.nombre,
+   	d.nombre AS 'Nombre Departamento'
+   FROM 
+   	empleado AS e 
+   RIGHT JOIN
+   	departamento d ON d.codigo = e.codigo_departamento
+   UNION
+   SELECT 
+   	e.nombre,
+   	d.nombre AS 'Nombre Departamento'
+   FROM 
+   	empleado AS e 
+   LEFT JOIN
+   	departamento d ON d.codigo = e.codigo_departamento;
+   	
+   +--------------+---------------------+
+   | nombre       | Nombre Departamento |
+   +--------------+---------------------+
+   | Aarón        | Desarrollo          |
+   | María        | Desarrollo          |
+   | Marta        | Desarrollo          |
+   | Adela        | Sistemas            |
+   | Pilar        | Sistemas            |
+   | Juan         | Sistemas            |
+   | Adolfo       | Recursos Humanos    |
+   | Pepe         | Recursos Humanos    |
+   | Adrián       | Contabilidad        |
+   | Marcos       | I+D                 |
+   | Diego        | I+D                 |
+   | NULL         | Proyectos           |
+   | NULL         | Publicidad          |
+   | Irene        | NULL                |
+   | Juan Antonio | NULL                |
+   +--------------+---------------------+
+   15 rows in set (0,00 sec)
+   
    ````
 
 5. Devuelve un listado con los empleados que no tienen ningún departamento
@@ -1214,6 +1456,36 @@ Resuelva todas las consultas utilizando las cláusulas LEFT JOIN y RIGHT JOIN.
    Ordene el listado alfabéticamente por el nombre del departamento.
 
    ````sql
+   SELECT 
+   	e.nombre,
+   	d.nombre AS 'Nombre Departamento'
+   FROM 
+   	empleado AS e 
+   LEFT JOIN
+   	departamento d ON d.codigo = e.codigo_departamento
+   WHERE
+   	d.codigo IS NULL
+   UNION
+   SELECT 
+   	e.nombre,
+   	d.nombre AS 'Nombre Departamento'
+   FROM 
+   	empleado AS e 
+   RIGHT JOIN
+   	departamento d ON d.codigo = e.codigo_departamento
+   WHERE
+   	e.codigo_departamento IS NULL;
+   	
+   +--------------+---------------------+
+   | nombre       | Nombre Departamento |
+   +--------------+---------------------+
+   | Irene        | NULL                |
+   | Juan Antonio | NULL                |
+   | NULL         | Proyectos           |
+   | NULL         | Publicidad          |
+   +--------------+---------------------+
+   4 rows in set (0,00 sec)
+   
    ````
 
 
@@ -1223,44 +1495,149 @@ Resuelva todas las consultas utilizando las cláusulas LEFT JOIN y RIGHT JOIN.
 1. Calcula la suma del presupuesto de todos los departamentos.
 
    ````sql
+   SELECT 
+   	SUM(d.presupuesto) AS 'Total Presupuesto'
+   FROM
+   	departamento AS d;
+   	
+   +-------------------+
+   | Total Presupuesto |
+   +-------------------+
+   |           1035000 |
+   +-------------------+
+   1 row in set (0,00 sec)
+   
    ````
 
 2. Calcula la media del presupuesto de todos los departamentos.
 
    ````sql
+   SELECT 
+   	ROUND(AVG(d.presupuesto)) AS 'Promedio Pesupuesto'
+   FROM
+   	departamento AS d;
+   
+   +---------------------+
+   | Promedio Pesupuesto |
+   +---------------------+
+   |              147857 |
+   +---------------------+
+   1 row in set (0,00 sec)
+   
+   
    ````
 
 3. Calcula el valor mínimo del presupuesto de todos los departamentos.
 
    ````sql
+   SELECT 
+   	MIN(d.presupuesto) AS 'Presupuesto Minimo'
+   FROM
+   	departamento AS d;
+   	
+   +--------------------+
+   | Presupuesto Minimo |
+   +--------------------+
+   |                  0 |
+   +--------------------+
+   1 row in set (0,01 sec)
+   
    ````
 
 4. Calcula el nombre del departamento y el presupuesto que tiene asignado,
    del departamento con menor presupuesto.
 
    ````sql
+   SELECT 
+       d.nombre AS 'Nombre del Departamento',
+       d.presupuesto AS 'Presupuesto'
+   FROM 
+       departamento AS d
+   WHERE 
+       d.presupuesto = (SELECT MIN(presupuesto) FROM departamento);
+       
+   +-------------------------+-------------+
+   | Nombre del Departamento | Presupuesto |
+   +-------------------------+-------------+
+   | Proyectos               |           0 |
+   | Publicidad              |           0 |
+   +-------------------------+-------------+
+   2 rows in set (0,00 sec)
+   
    ````
 
 5. Calcula el valor máximo del presupuesto de todos los departamentos.
 
    ````sql
+   SELECT 
+   	MAX(d.presupuesto) AS 'Presupuesto Maximo'
+   FROM
+   	departamento AS d ;
+   
+   +--------------------+
+   | Presupuesto Maximo |
+   +--------------------+
+   |             375000 |
+   +--------------------+
+   1 row in set (0,00 sec)
+   
    ````
 
 6. Calcula el nombre del departamento y el presupuesto que tiene asignado,
    del departamento con mayor presupuesto.
 
    ````sql
+   SELECT 
+       d.nombre AS 'Nombre del Departamento',
+       d.presupuesto AS 'Presupuesto'
+   FROM 
+       departamento AS d
+   WHERE 
+       d.presupuesto = (SELECT MAX(presupuesto) FROM departamento);
+       
+   +-------------------------+-------------+
+   | Nombre del Departamento | Presupuesto |
+   +-------------------------+-------------+
+   | I+D                     |      375000 |
+   +-------------------------+-------------+
+   1 row in set (0,00 sec)
    ````
 
 7. Calcula el número total de empleados que hay en la tabla empleado.
 
    ````sql
+   SELECT 
+   	COUNT(e.codigo) AS 'Total Empleados'
+   FROM
+   	empleado AS e;
+   
+   +-----------------+
+   | Total Empleados |
+   +-----------------+
+   |              13 |
+   +-----------------+
+   1 row in set (0,00 sec)
+   
    ````
 
 8. Calcula el número de empleados que no tienen NULL en su segundo
    apellido.
 
    ````sql
+   SELECT 
+   	COUNT(e.codigo) AS 'Empleados Con dos Apellidos'
+   FROM
+   	empleado AS e
+   WHERE 
+   	e.apellido2 IS NOT NULL;
+   	
+   +-----------------------------+
+   | Empleados Con dos Apellidos |
+   +-----------------------------+
+   |                          11 |
+   +-----------------------------+
+   1 row in set (0,00 sec)
+   
    ````
 
 9. Calcula el número de empleados que hay en cada departamento. Tienes que
@@ -1268,6 +1645,30 @@ Resuelva todas las consultas utilizando las cláusulas LEFT JOIN y RIGHT JOIN.
    número de empleados que tiene asignados.
 
    ````sql
+   SELECT 
+       d.nombre AS 'Nombre del Departamento',
+       COUNT(e.codigo) AS 'Número de Empleados'
+   FROM 
+       departamento d
+   LEFT JOIN 
+       empleado e ON d.codigo = e.codigo_departamento
+   GROUP BY 
+       d.codigo, d.nombre;
+       
+   +-------------------------+----------------------+
+   | Nombre del Departamento | Número de Empleados  |
+   +-------------------------+----------------------+
+   | Desarrollo              |                    3 |
+   | Sistemas                |                    3 |
+   | Recursos Humanos        |                    2 |
+   | Contabilidad            |                    1 |
+   | I+D                     |                    2 |
+   | Proyectos               |                    0 |
+   | Publicidad              |                    0 |
+   +-------------------------+----------------------+
+   7 rows in set (0,00 sec)
+   
+   
    ````
 
 10. Calcula el nombre de los departamentos que tienen más de 2 empleados. El
@@ -1275,6 +1676,26 @@ Resuelva todas las consultas utilizando las cláusulas LEFT JOIN y RIGHT JOIN.
     otra con el número de empleados que tiene asignados.
 
     ````sql
+    SELECT 
+        d.nombre AS 'Nombre del Departamento',
+        COUNT(e.codigo) AS 'Número de Empleados'
+    FROM 
+        departamento AS d
+    LEFT JOIN 
+        empleado e ON d.codigo = e.codigo_departamento
+    GROUP BY 
+        d.nombre
+    HAVING 
+    	COUNT(e.codigo) > 2;
+    	
+    +-------------------------+----------------------+
+    | Nombre del Departamento | Número de Empleados  |
+    +-------------------------+----------------------+
+    | Desarrollo              |                    3 |
+    | Sistemas                |                    3 |
+    +-------------------------+----------------------+
+    2 rows in set (0,00 sec)
+    
     ````
 
 11. Calcula el número de empleados que trabajan en cada uno de los
@@ -1282,12 +1703,54 @@ Resuelva todas las consultas utilizando las cláusulas LEFT JOIN y RIGHT JOIN.
     aquellos departamentos que no tienen ningún empleado asociado.
 
     `````sql
+    SELECT 
+        d.nombre AS 'Nombre del Departamento',
+        COUNT(e.codigo) AS 'Número de Empleados'
+    FROM 
+        departamento d
+    LEFT JOIN 
+        empleado e ON d.codigo = e.codigo_departamento
+    GROUP BY 
+        d.codigo, d.nombre;
+        
+    +-------------------------+----------------------+
+    | Nombre del Departamento | Número de Empleados  |
+    +-------------------------+----------------------+
+    | Desarrollo              |                    3 |
+    | Sistemas                |                    3 |
+    | Recursos Humanos        |                    2 |
+    | Contabilidad            |                    1 |
+    | I+D                     |                    2 |
+    | Proyectos               |                    0 |
+    | Publicidad              |                    0 |
+    +-------------------------+----------------------+
+    7 rows in set (0,00 sec)
     `````
 
 12. Calcula el número de empleados que trabajan en cada unos de los
     departamentos que tienen un presupuesto mayor a 200000 euros.
 
     `````sql
+    SELECT 
+        d.nombre AS 'Nombre del Departamento',
+        COUNT(e.codigo) AS 'Número de Empleados'
+    FROM 
+        departamento AS d
+    LEFT JOIN 
+        empleado e ON d.codigo = e.codigo_departamento
+    WHERE 
+    	d.presupuesto > 200000
+    GROUP BY 
+        d.nombre;
+        
+    +-------------------------+----------------------+
+    | Nombre del Departamento | Número de Empleados  |
+    +-------------------------+----------------------+
+    | Recursos Humanos        |                    2 |
+    | I+D                     |                    2 |
+    +-------------------------+----------------------+
+    2 rows in set (0,00 sec)
+    
     `````
 
 
@@ -1300,18 +1763,77 @@ Resuelva todas las consultas utilizando las cláusulas LEFT JOIN y RIGHT JOIN.
    de Sistemas. (Sin utilizar INNER JOIN).
 
    `````sql
+   SELECT 
+   	e.nombre 
+   FROM
+   	empleado AS e 
+   WHERE 
+   	e.codigo_departamento = (
+   		SELECT 
+           	d.codigo 
+   		FROM 
+           	departamento AS d
+   		WHERE 
+   			d.nombre = 'Sistemas'
+   	);
+   							
+   +--------+
+   | nombre |
+   +--------+
+   | Adela  |
+   | Pilar  |
+   | Juan   |
+   +--------+
+   3 rows in set (0,00 sec)
+   
    `````
 
 2. Devuelve el nombre del departamento con mayor presupuesto y la cantidad
    que tiene asignada.
 
    ````sql
+   SELECT 
+   	d.nombre,
+   	d.presupuesto 
+   FROM
+   	departamento AS d
+   WHERE 
+   	d.presupuesto  = (
+   		SELECT MAX(d.presupuesto)
+   		FROM departamento AS d
+   	);
+   
+   +--------+-------------+
+   | nombre | presupuesto |
+   +--------+-------------+
+   | I+D    |      375000 |
+   +--------+-------------+
+   1 row in set (0,00 sec)
+   
    ````
 
 3. Devuelve el nombre del departamento con menor presupuesto y la cantidad
    que tiene asignada.
 
    ````sql
+   SELECT 
+   	d.nombre,
+   	d.presupuesto 
+   FROM
+   	departamento AS d
+   WHERE 
+   	d.presupuesto  = (
+   		SELECT MIN(d.presupuesto)
+   		FROM departamento AS d
+   	);
+   	
+   +------------+-------------+
+   | nombre     | presupuesto |
+   +------------+-------------+
+   | Proyectos  |           0 |
+   | Publicidad |           0 |
+   +------------+-------------+
+   2 rows in set (0,00 sec)
    ````
 
 
@@ -1322,24 +1844,110 @@ Resuelva todas las consultas utilizando las cláusulas LEFT JOIN y RIGHT JOIN.
    que tiene asignada. Sin hacer uso de MAX, ORDER BY ni LIMIT.
 
    `````sql
+   SELECT 
+   	d.nombre,
+   	d.presupuesto 
+   FROM
+   	departamento AS d
+   WHERE 
+   	d.presupuesto > ALL (
+   	  SELECT presupuesto 
+   	  FROM departamento
+   	  WHERE 
+   	  	presupuesto > d.presupuesto 
+   	);
+   	
+   +--------+-------------+
+   | nombre | presupuesto |
+   +--------+-------------+
+   | I+D    |      375000 |
+   +--------+-------------+
+   1 row in set (0,00 sec)
+   
    `````
 
 5. Devuelve el nombre del departamento con menor presupuesto y la cantidad
    que tiene asignada. Sin hacer uso de MIN, ORDER BY ni LIMIT.
 
    ````sql
+   SELECT 
+   	d.nombre,
+   	d.presupuesto 
+   FROM
+   	departamento AS d
+   WHERE 
+   	d.presupuesto < ALL (
+   	  SELECT presupuesto 
+   	  FROM departamento
+   	  WHERE 
+   	  	presupuesto < d.presupuesto 
+   	);
+   	
+   +------------+-------------+
+   | nombre     | presupuesto |
+   +------------+-------------+
+   | Proyectos  |           0 |
+   | Publicidad |           0 |
+   +------------+-------------+
+   2 rows in set (0,01 sec)
+   	
    ````
 
 6. Devuelve los nombres de los departamentos que tienen empleados
    asociados. (Utilizando ALL o ANY).
 
    ````sql
+   SELECT 
+   	d.nombre
+   FROM
+   	departamento AS d
+   WHERE 
+   	d.codigo = ANY(
+   	  SELECT e.codigo_departamento 
+   	  FROM empleado AS e 
+   	);
+   	
+   +------------------+
+   | nombre           |
+   +------------------+
+   | Desarrollo       |
+   | Sistemas         |
+   | Recursos Humanos |
+   | Contabilidad     |
+   | I+D              |
+   +------------------+
+   5 rows in set (0,00 sec)
+   
    ````
 
 7. Devuelve los nombres de los departamentos que no tienen empleados
    asociados. (Utilizando ALL o ANY).
 
    ````sql
+   SELECT 
+       d.nombre
+   FROM 
+       departamento AS d
+   WHERE 
+   	d.codigo = ANY (
+   	SELECT 
+       	d.codigo
+   	FROM 
+   	    departamento AS d
+   	LEFT JOIN 
+   	    empleado e ON d.codigo = e.codigo_departamento
+   	WHERE 
+   		e.codigo_departamento IS NULL
+   	);
+   	
+   +------------+
+   | nombre     |
+   +------------+
+   | Proyectos  |
+   | Publicidad |
+   +------------+
+   2 rows in set (0,00 sec)
+   
    ````
 
 
@@ -1350,12 +1958,14 @@ Resuelva todas las consultas utilizando las cláusulas LEFT JOIN y RIGHT JOIN.
    asociados. (Utilizando IN o NOT IN).
 
    ````sql
+   
    ````
 
 9. Devuelve los nombres de los departamentos que no tienen empleados
    asociados. (Utilizando IN o NOT IN).
 
    ````sql
+   
    ````
 
 
@@ -1366,12 +1976,15 @@ Resuelva todas las consultas utilizando las cláusulas LEFT JOIN y RIGHT JOIN.
     asociados. (Utilizando EXISTS o NOT EXISTS).
 
     ````sql
+    
     ````
 
 11. Devuelve los nombres de los departamentos que tienen empleados
     asociados. (Utilizando EXISTS o NOT EXISTS).
 
     ````sql
+    
     ````
 
+    
     
