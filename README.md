@@ -1958,13 +1958,55 @@ Resuelva todas las consultas utilizando las cláusulas LEFT JOIN y RIGHT JOIN.
    asociados. (Utilizando IN o NOT IN).
 
    ````sql
-   
+   SELECT 
+   	d.nombre
+   FROM 
+   	departamento AS d
+   WHERE
+   	d.codigo IN (
+       	SELECT 
+           	e.codigo_departamento
+           FROM 
+           	empleado AS e
+       );
+       
+    +------------------+
+   | nombre           |
+   +------------------+
+   | Desarrollo       |
+   | Sistemas         |
+   | Recursos Humanos |
+   | Contabilidad     |
+   | I+D              |
+   +------------------+
+   5 rows in set (0.02 sec)
    ````
-
+   
 9. Devuelve los nombres de los departamentos que no tienen empleados
    asociados. (Utilizando IN o NOT IN).
 
    ````sql
+   SELECT 
+   	d.nombre
+   FROM 
+   	departamento AS d
+   WHERE
+   	d.codigo NOT IN (
+       	SELECT 
+           	e.codigo_departamento
+           FROM 
+           	empleado AS e
+           WHERE
+           	e.codigo_departamento IS NOT NULL
+       );
+       
+   +------------+
+   | nombre     |
+   +------------+
+   | Proyectos  |
+   | Publicidad |
+   +------------+
+   2 rows in set (0.00 sec)
    
    ````
 
@@ -1976,15 +2018,55 @@ Resuelva todas las consultas utilizando las cláusulas LEFT JOIN y RIGHT JOIN.
     asociados. (Utilizando EXISTS o NOT EXISTS).
 
     ````sql
-    
+    SELECT 
+    	d.nombre
+    FROM 
+    	departamento AS d
+    WHERE EXISTS (
+        	SELECT 
+            	e.codigo_departamento
+            FROM 
+            	empleado AS e
+        	WHERE
+        		e.codigo_departamento = d.codigo
+        );
+        
+    +------------------+
+    | nombre           |
+    +------------------+
+    | Desarrollo       |
+    | Sistemas         |
+    | Recursos Humanos |
+    | Contabilidad     |
+    | I+D              |
+    +------------------+
+    5 rows in set (0.00 sec)
     ````
-
+    
 11. Devuelve los nombres de los departamentos que tienen empleados
     asociados. (Utilizando EXISTS o NOT EXISTS).
 
     ````sql
-    
+    SELECT 
+    	d.nombre
+    FROM 
+    	departamento AS d
+    WHERE NOT EXISTS (
+        	SELECT 
+            	e.codigo_departamento
+            FROM 
+            	empleado AS e
+        	WHERE
+        		e.codigo_departamento = d.codigo
+        );
+        
+    +------------+
+    | nombre     |
+    +------------+
+    | Proyectos  |
+    | Publicidad |
+    +------------+
+    2 rows in set (0.00 sec)
     ````
-
     
     
